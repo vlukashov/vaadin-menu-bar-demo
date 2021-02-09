@@ -5,6 +5,9 @@ import '@vaadin/vaadin-app-layout/vaadin-drawer-toggle';
 import '@vaadin/vaadin-avatar/vaadin-avatar';
 import '@vaadin/vaadin-tabs/theme/lumo/vaadin-tab';
 import '@vaadin/vaadin-tabs/theme/lumo/vaadin-tabs';
+import '@vaadin/vaadin-menu-bar/vaadin-menu-bar';
+import type { MenuBarItem } from '@vaadin/vaadin-menu-bar';
+import '@vaadin/vaadin-icons/vaadin-icons';
 import { css, customElement, html, LitElement, property } from 'lit-element';
 import { router } from '../../index';
 
@@ -20,6 +23,21 @@ export class MainView extends LitElement {
   @property({ type: Array }) menuTabs: MenuTab[] = [
     { route: 'hello', name: 'Hello World' },
     { route: 'about', name: 'About' },
+  ];
+
+  // https://vaadin.com/components/vaadin-menu-bar/html-examples/menu-bar-items-demos
+  @property({type: Array}) menuItems: MenuBarItem[] = [
+    {
+      component: this.makeIcon('vaadin:info-circle-o', 'Info'),
+      children: [
+        {text: 'Support'},
+        {text: 'Benutzerhandbuch öffnen (PDF)'},
+        {text: 'Über Selfservices'},
+      ]
+    },
+    {
+      component: this.makeIcon('vaadin:user'),
+    }
   ];
 
   @property({ type: String }) projectName = 'menu-bar-sample';
@@ -47,10 +65,9 @@ export class MainView extends LitElement {
           font-size: var(--lumo-font-size-l);
           margin: 0;
         }
-
-        header vaadin-avatar {
+        
+        header vaadin-menu-bar {
           margin-left: auto;
-          margin-right: var(--lumo-space-m);
         }
 
         vaadin-app-layout[dir='rtl'] header vaadin-avatar {
@@ -105,7 +122,10 @@ export class MainView extends LitElement {
         <header slot="navbar" theme="dark">
           <vaadin-drawer-toggle></vaadin-drawer-toggle>
           <h1>${this.getSelectedTabName(this.menuTabs)}</h1>
-          <vaadin-avatar></vaadin-avatar>
+          <vaadin-menu-bar
+            .items="${this.menuItems}"
+            @item-selected="${this.onMenuItemSelected}"
+          ></vaadin-menu-bar>
         </header>
 
         <div slot="drawer">
@@ -167,5 +187,22 @@ export class MainView extends LitElement {
       tabName = 'Hello World';
     }
     return tabName;
+  }
+
+  private onMenuItemSelected(e: CustomEvent) {
+    const selected = e.detail.value;
+    const selectedText = selected.text || selected.component?.querySelector('iron-icon')?.icon;
+    console.log(`selected: ${selectedText}`);
+  }
+
+  private makeIcon(img: string, txt?: string) {
+    const item = window.document.createElement('vaadin-context-menu-item');
+    const icon = window.document.createElement('iron-icon');
+    icon.setAttribute('icon', img);
+    item.appendChild(icon);
+    if (txt) {
+      item.appendChild(window.document.createTextNode(txt));
+    }
+    return item;
   }
 }
