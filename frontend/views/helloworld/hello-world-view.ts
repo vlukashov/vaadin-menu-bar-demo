@@ -11,8 +11,8 @@ export class HelloWorldView extends View {
 
   render() {
     return html`
-      <vaadin-text-field label="Your name" @value-changed="${this.nameChanged}"></vaadin-text-field>
-      <vaadin-button @click="${this.sayHello}">Say hello</vaadin-button>
+      <p>Resize the window to see the icon labels in the top menu appear and disappear.</p>
+      <p>Click at the menu items and check the browser console to see which item was selected</p> 
     `;
   }
   nameChanged(e: CustomEvent) {

@@ -11,6 +11,19 @@ import '@vaadin/vaadin-icons/vaadin-icons';
 import { css, customElement, html, LitElement, property } from 'lit-element';
 import { router } from '../../index';
 
+// https://vaadin.com/docs/v14/themes/importing-style-sheets.html#example
+// Import the function that allows you to register style sheets for components
+import { registerStyles } from '@vaadin/vaadin-themable-mixin/register-styles.js';
+
+// Define and register a style sheet for the <vaadin-text-field> component
+registerStyles('vaadin-menu-bar', css`
+  @media (max-width: 600px) {
+      .hide-on-small-screen {
+      display: none;
+    }
+  }
+`);
+
 interface MenuTab {
   route: string;
   name: string;
@@ -36,7 +49,11 @@ export class MainView extends LitElement {
       ]
     },
     {
-      component: this.makeIcon('vaadin:user'),
+      component: this.makeIcon('vaadin:user', 'Benutzer'),
+      children: [
+        {text: 'Profile'},
+        {text: 'Log out'},
+      ]
     }
   ];
 
@@ -190,9 +207,7 @@ export class MainView extends LitElement {
   }
 
   private onMenuItemSelected(e: CustomEvent) {
-    const selected = e.detail.value;
-    const selectedText = selected.text || selected.component?.querySelector('iron-icon')?.icon;
-    console.log(`selected: ${selectedText}`);
+    console.log(`selected: ${e.detail.value.text}`);
   }
 
   private makeIcon(img: string, txt?: string) {
@@ -201,7 +216,10 @@ export class MainView extends LitElement {
     icon.setAttribute('icon', img);
     item.appendChild(icon);
     if (txt) {
-      item.appendChild(window.document.createTextNode(txt));
+      const span = window.document.createElement('span');
+      span.classList.add('hide-on-small-screen')
+      span.innerHTML = txt;
+      item.appendChild(span);
     }
     return item;
   }
